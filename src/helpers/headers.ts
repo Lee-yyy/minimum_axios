@@ -23,3 +23,18 @@ function normalizeHeaders(headers: any, normalizeName: string): any {
     }
   })
 }
+
+export function processResponseHeader(headers: string): any {
+  let parsed = Object.create(null)
+  if (!headers) {
+    return parsed
+  }
+
+  headers.split('\r\n').forEach(line => {
+    let [key, value] = line.split(':')
+    key = key.trim().toLowerCase()
+    if (!key) return
+    parsed[key] = value ? value.trim() : value
+  })
+  return parsed
+}
