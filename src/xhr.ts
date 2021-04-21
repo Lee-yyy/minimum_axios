@@ -1,3 +1,4 @@
+import { creatError } from './helpers/error'
 import { processResponseHeader } from './helpers/headers'
 import { AxiosRequestConfig, PromiseAxiosResponse } from './types'
 
@@ -12,7 +13,8 @@ export default function xhr(config: AxiosRequestConfig): PromiseAxiosResponse {
     request.onreadystatechange = function() {
       if (request.readyState !== 4) return
 
-      if (request.status === 0) return //请求已经发出，但是由于服务器对接收到的请求并没有应答，因此我们并没有得到服务器的响应状态，并且服务器的处理状态我们也不得而知，
+      if (request.status === 0) return
+      // 请求已经发出，但是由于服务器对接收到的请求并没有应答，因此我们并没有得到服务器的响应状态，并且服务器的处理状态我们也不得而知，
 
       let responseHeaders = processResponseHeader(request.getAllResponseHeaders())
       let responseData = responseType === 'text' ? request.responseText : request.response
@@ -28,7 +30,15 @@ export default function xhr(config: AxiosRequestConfig): PromiseAxiosResponse {
       if (request.status >= 200 && request.status < 300) {
         resolve(response)
       } else {
-        reject(`${request.status} ${request.statusText}`)
+        reject(
+          creatError(
+            `response status is not allow,${request.statusText}`,
+            config,
+            request.status,
+            request,
+            response
+          )
+        )
       }
     }
 

@@ -18,16 +18,16 @@ function collectParams(params: any): string[] {
   let parts: string[] = []
 
   Object.keys(params).forEach(key => {
-    let val = params[key],
-      values = []
+    let val = params[key]
+    let values = []
 
-    if (val === null || typeof val === 'undefined')
-      if (Array.isArray(val)) {
-        values = val
-        key = key + '[]'
-      } else {
-        values = [val]
-      }
+    if (val === null || typeof val === 'undefined') return
+    if (Array.isArray(val)) {
+      values = val
+      key = key + '[]'
+    } else {
+      values = [val]
+    }
 
     values.forEach(value => {
       if (isDate(value)) {
@@ -35,7 +35,7 @@ function collectParams(params: any): string[] {
       } else if (isObject(value)) {
         value = JSON.stringify(value)
       }
-      parts.push(`${encode(key)} = ${encode(value)}`)
+      parts.push(`${encode(key)}=${encode(value)}`)
     })
   })
 

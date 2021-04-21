@@ -11,7 +11,9 @@ export function processResponseData(data: any): any {
   if (typeof data === 'string') {
     try {
       data = JSON.parse(data)
-    } catch (e) {}
+    } catch (e) {
+      //
+    }
   }
   return data
 }
