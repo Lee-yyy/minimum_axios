@@ -1,7 +1,31 @@
-import { AxiosRequestConfig, Method, PromiseAxiosResponse } from '../types'
+import {
+  AxiosRequestConfig,
+  AxiosResponse,
+  Method,
+  PromiseAxiosResponse,
+  RejectedFn,
+  ResolvedFn
+} from '../types'
 import dispatchRequest from './dispatchRequest'
+import InterceptorManager from './interceptorManager'
 
+interface Interceptors {
+  request: InterceptorManager<AxiosRequestConfig>
+  response: InterceptorManager<AxiosResponse>
+}
+
+interface PromiseChain<T> {
+  resolved: ResolvedFn<T> | ((config: AxiosRequestConfig) => PromiseAxiosResponse)
+  rejected?: RejectedFn
+}
 export default class Axios {
+  interceptors: Interceptors
+  constructor() {
+    this.interceptors = {
+      request: new InterceptorManager<AxiosRequestConfig>(),
+      response: new InterceptorManager<AxiosResponse>()
+    }
+  }
   //request , get , _requestMethodWithoutData 等均为原型方法
   request(url: any, config?: any): PromiseAxiosResponse {
     if (typeof url === 'string') {
@@ -12,6 +36,13 @@ export default class Axios {
     } else {
       config = url
     }
+
+    const chain: PromiseChain<any>[] = [
+      {
+        resolved: dispatchRequest,
+        rejected: undefined
+      }
+    ]
     return dispatchRequest(config)
   }
 
