@@ -17,7 +17,7 @@ export type Method =
   | 'CONNECT'
 
 export interface AxiosRequestConfig {
-  url: string
+  url?: string
   method?: Method
   data?: any
   params?: any
@@ -43,4 +43,20 @@ export interface AxiosError extends Error {
   request?: any
   response?: any
   isAxiosError: boolean
+}
+
+export interface Axios {
+  request(config: AxiosRequestConfig): PromiseAxiosResponse
+  get(url: string, config?: AxiosRequestConfig): PromiseAxiosResponse
+  delete(url: string, config?: AxiosRequestConfig): PromiseAxiosResponse
+  head(url: string, config?: AxiosRequestConfig): PromiseAxiosResponse
+  options(url: string, config?: AxiosRequestConfig): PromiseAxiosResponse
+  post(url: string, data?: any, config?: AxiosRequestConfig): PromiseAxiosResponse
+  put(url: string, data?: any, config?: AxiosRequestConfig): PromiseAxiosResponse
+  patch(url: string, data?: any, config?: AxiosRequestConfig): PromiseAxiosResponse
+}
+
+export interface AxiosInstance extends Axios {
+  (config: AxiosRequestConfig): PromiseAxiosResponse
+  (url: string, config?: AxiosRequestConfig): PromiseAxiosResponse
 }
