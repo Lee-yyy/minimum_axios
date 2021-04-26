@@ -2,7 +2,7 @@ import { processRequestData, processResponseData } from './helpers/data'
 import { processRequestHeaders } from './helpers/headers'
 import buildURL from './helpers/url'
 import { AxiosRequestConfig, AxiosResponse, PromiseAxiosResponse } from './types'
-import xhr from './xhr'
+import xhr from './core/xhr'
 
 export default function axios(config: AxiosRequestConfig): PromiseAxiosResponse {
   processConfig(config)

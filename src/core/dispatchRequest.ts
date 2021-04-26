@@ -2,10 +2,11 @@ import { processRequestData, processResponseData } from '../helpers/data'
 import { flattenHeaders, processRequestHeaders } from '../helpers/headers'
 import buildURL from '../helpers/url'
 import { AxiosRequestConfig, AxiosResponse, PromiseAxiosResponse } from '../types'
-import xhr from '../xhr'
+import xhr from './xhr'
 import transform from './transform'
 
 export default function dispatchRequest(config: AxiosRequestConfig): PromiseAxiosResponse {
+  throwIfCancellationRequested(config)
   processConfig(config)
   return xhr(config).then(response => {
     return transformResponseData(response)
@@ -37,4 +38,10 @@ function transformRequestData(config: AxiosRequestConfig): any {
 function transformResponseData(response: AxiosResponse): AxiosResponse {
   response.data = transform(response.data, response.headers, response.config.transformResponse)
   return response
+}
+
+function throwIfCancellationRequested(config: AxiosRequestConfig): void {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested()
+  }
 }

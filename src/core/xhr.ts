@@ -1,12 +1,12 @@
-import { creatError } from './helpers/error'
-import { processResponseHeader } from './helpers/headers'
-import { AxiosRequestConfig, PromiseAxiosResponse } from './types'
+import { creatError } from '../helpers/error'
+import { processResponseHeader } from '../helpers/headers'
+import { AxiosRequestConfig, PromiseAxiosResponse } from '../types'
 
 export default function xhr(config: AxiosRequestConfig): PromiseAxiosResponse {
   return new Promise((resolve, reject) => {
-    let { method = 'get', url, data = null, responseType, timeout } = config
+    let { method = 'get', url, data = null, responseType, timeout, cancelToken } = config
     let request = new XMLHttpRequest()
-    request.open(method, url, true)
+    request.open(method, url!, true)
     if (responseType) {
       request.responseType = responseType
     }
@@ -50,6 +50,13 @@ export default function xhr(config: AxiosRequestConfig): PromiseAxiosResponse {
     }
     request.onerror = function() {
       reject(new Error('Network error'))
+    }
+
+    if (cancelToken) {
+      cancelToken.promise.then(reason => {
+        request.abort()
+        reject(reason)
+      })
     }
     request.send(data)
   })
