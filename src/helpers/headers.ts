@@ -1,4 +1,5 @@
-import { isObject } from './util'
+import { Method } from '../types'
+import { deepMerge, isObject } from './util'
 
 export function processRequestHeaders(headers: any, data: any): any {
   normalizeHeaders(headers, 'Content-Type')
@@ -37,4 +38,11 @@ export function processResponseHeader(headers: string): any {
     parsed[key] = value ? value.trim() : value
   })
   return parsed
+}
+
+export function flattenHeaders(headers: any, method: Method): any {
+  if (!headers) {
+    return headers
+  }
+  headers = deepMerge(headers.common, headers[method])
 }
