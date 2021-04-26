@@ -1,10 +1,23 @@
+import cookie from '../helpers/cookie'
 import { creatError } from '../helpers/error'
 import { processResponseHeader } from '../helpers/headers'
+import { isURLSameOrigin } from '../helpers/url'
 import { AxiosRequestConfig, PromiseAxiosResponse } from '../types'
 
 export default function xhr(config: AxiosRequestConfig): PromiseAxiosResponse {
   return new Promise((resolve, reject) => {
-    let { method = 'get', url, data = null, responseType, timeout, cancelToken } = config
+    let {
+      method = 'get',
+      url,
+      data = null,
+      responseType,
+      headers,
+      timeout,
+      cancelToken,
+      withCredentials,
+      xsrfCookieName,
+      xsrfHeaderName
+    } = config
     let request = new XMLHttpRequest()
     request.open(method, url!, true)
     if (responseType) {
@@ -51,7 +64,13 @@ export default function xhr(config: AxiosRequestConfig): PromiseAxiosResponse {
     request.onerror = function() {
       reject(new Error('Network error'))
     }
-
+    if ((withCredentials || isURLSameOrigin(url!)) && xsrfCookieName) {
+      // request.withCredentials = withCredentials
+      const xsrfValue = cookie.read(xsrfCookieName)
+      if (xsrfValue && xsrfHeaderName) {
+        headers[xsrfHeaderName] = xsrfValue
+      }
+    }
     if (cancelToken) {
       cancelToken.promise.then(reason => {
         request.abort()
