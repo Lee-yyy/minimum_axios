@@ -1,18 +1,28 @@
-import { isDate, isObject } from './util'
+import { isDate, isObject, isURLSearchParams } from './util'
 
 interface URLOrigin {
   protocol: string
   host: string
 }
 
-export default function buildURL(url: string, params: any): string {
+export default function buildURL(
+  url: string,
+  params: any,
+  paramsSerializer?: (params: any) => string
+): string {
   if (!params) {
     return url
   }
+  let serializedParams
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params)
+  } else if (isURLSearchParams(params)) {
+    serializedParams = params.toString()
+  } else {
+    let parts = collectParams(params)
 
-  let parts = collectParams(params)
-
-  let serializedParams = serializeParts(parts)
+    serializedParams = serializeParts(parts)
+  }
 
   processURL(url)
 
