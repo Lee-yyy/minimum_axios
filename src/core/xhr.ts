@@ -20,7 +20,8 @@ export default function xhr(config: AxiosRequestConfig): PromiseAxiosResponse {
       xsrfHeaderName,
       onDownLoadProgress,
       onUploadProgress,
-      auth
+      auth,
+      validateStatus
     } = config
     let request = new XMLHttpRequest()
     request.open(method, url!, true)
@@ -47,7 +48,21 @@ export default function xhr(config: AxiosRequestConfig): PromiseAxiosResponse {
       }
     }
 
-    // function handleResponse(response: AxiosResponse):void{}
+    function handleResponse(response: AxiosResponse): void {
+      if (!validateStatus || validateStatus(response.status)) {
+        resolve(response)
+      } else {
+        reject(
+          creatError(
+            `Request failed with status code ${response.status}`,
+            config,
+            undefined,
+            request,
+            response
+          )
+        )
+      }
+    }
 
     function addEvents(): void {
       request.onreadystatechange = function() {
